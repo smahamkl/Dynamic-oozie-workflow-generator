@@ -52,7 +52,7 @@
     "ApplicationName": "name",
 	"ClassName": "Application.class",
     "Jar": "jar-name",
-    "SparkOpts": "spark-opts",
+    "SparkOpts": "--queue queue-name --files file-path --driver-memory driver-memory --executor-memory executor-memory --executor-cores executor-cores",
     "Args": [
       {
         "Arg": "spark-arg-1"

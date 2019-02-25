@@ -34,10 +34,17 @@ public class DynamicWorkflowGeneratorImpl implements WorkflowGenerator {
 	 * oozie.model.DynamicWorkflowConfig)
 	 */
 	public String generateWorkFlow(DynamicWorkflowConfig dynamicWorkflowConfigObj) {
-		LOGGER.info("Start of generateWorkFlow");
-		WorkFlowApp workFlowApp = addNodeDetailsToWorkflow(dynamicWorkflowConfigObj);
-		LOGGER.info("End of generateWorkFlow");
-		return createWorkflowXMLFileAsString(workFlowApp);
+
+		try {
+			LOGGER.info("Start of generateWorkFlow");
+			WorkFlowApp workFlowApp = addNodeDetailsToWorkflow(dynamicWorkflowConfigObj);
+			LOGGER.info("End of generateWorkFlow");
+			return createWorkflowXMLFileAsString(workFlowApp);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			return null;
+		}
+
 	}
 
 	/**
@@ -45,9 +52,10 @@ public class DynamicWorkflowGeneratorImpl implements WorkflowGenerator {
 	 * 
 	 * @param dynamicWorkflowConfigObj
 	 * @return WorkFlowApp
+	 * @throws Exception
 	 * 
 	 */
-	protected WorkFlowApp addNodeDetailsToWorkflow(DynamicWorkflowConfig dynamicWorkflowConfigObj) {
+	protected WorkFlowApp addNodeDetailsToWorkflow(DynamicWorkflowConfig dynamicWorkflowConfigObj) throws Exception {
 		LOGGER.info("Start of addNodeDetailsToWorkflow");
 		OozieNodeFactory oozieNodeFactory = new OozieNodeFactory();
 		WorkFlowApp workFlowApp = oozieNodeFactory.createWorkFlowApp();
@@ -59,32 +67,28 @@ public class DynamicWorkflowGeneratorImpl implements WorkflowGenerator {
 			// Adding global node details
 			if (dynamicWorkflowConfigObj.getGlobalNodeDetails() != null) {
 				workFlowApp.setGlobal(nodeCreator.createGlobalNode(dynamicWorkflowConfigObj.getGlobalNodeDetails()));
+			} else {
+				System.out.println("GlobalConfigs need to be defined...exiting out");
+				System.exit(2);
 			}
 
 			// Adding SSH action node details
-			if (dynamicWorkflowConfigObj.getSSHNodeDetails() != null) {
-				SSHNodeDetails sshNodeDetails = dynamicWorkflowConfigObj.getSSHNodeDetails();
-				workFlowApp.getDecisionOrForkOrJoin()
-						.add(nodeCreator.createSSHActionNode(sshNodeDetails.getNodeName(), sshNodeDetails.getHost(),
-								sshNodeDetails.getCommand(), sshNodeDetails.getArgs(), sshNodeDetails.getOkToName(),
-								sshNodeDetails.getErrorToName()));
-			}
-			// Adding Java action node details
-			if (dynamicWorkflowConfigObj.getJavaNodeDetails() != null) {
-				JavaNodeDetails javaNodeDetails = dynamicWorkflowConfigObj.getJavaNodeDetails();
-				workFlowApp.getDecisionOrForkOrJoin().add(nodeCreator.createJavaActionNode(
-						javaNodeDetails.getNodeName(), javaNodeDetails.getJobTracker(), javaNodeDetails.getNameNode(),
-						javaNodeDetails.getPrepareNode(), javaNodeDetails.getJobXML(),
-						javaNodeDetails.getConfigurationProperties(), javaNodeDetails.getMainClass(),
-						javaNodeDetails.getArgs(), javaNodeDetails.getOkayToName(), javaNodeDetails.getErrorToName()));
-			}
-
+			/*
+			 * if (dynamicWorkflowConfigObj.getSSHNodeDetails() != null) { SSHNodeDetails
+			 * sshNodeDetails = dynamicWorkflowConfigObj.getSSHNodeDetails();
+			 * workFlowApp.getDecisionOrForkOrJoin()
+			 * .add(nodeCreator.createSSHActionNode(sshNodeDetails.getNodeName(),
+			 * sshNodeDetails.getHost(), sshNodeDetails.getCommand(),
+			 * sshNodeDetails.getArgs(), sshNodeDetails.getOkToName(),
+			 * sshNodeDetails.getErrorToName())); }
+			 */
 			// Adding Sqoop action node details
 			if (dynamicWorkflowConfigObj.getSqoopNodeDetails() != null) {
 				SqoopNodeDetails sqoopNodeDetails = dynamicWorkflowConfigObj.getSqoopNodeDetails();
 				workFlowApp.getDecisionOrForkOrJoin()
 						.add(nodeCreator.createSqoopActionNode(sqoopNodeDetails.getNodeName(),
-								sqoopNodeDetails.getJobTracker(), sqoopNodeDetails.getNameNode(),
+								dynamicWorkflowConfigObj.getGlobalNodeDetails().getJobTracker(),
+								dynamicWorkflowConfigObj.getGlobalNodeDetails().getNameNode(),
 								sqoopNodeDetails.getPrepareNode(), sqoopNodeDetails.getJobXML(),
 								sqoopNodeDetails.getConfigurationProperties(), sqoopNodeDetails.getArgs(),
 								sqoopNodeDetails.getFiles(), sqoopNodeDetails.getOkayToName(),
@@ -96,11 +100,23 @@ public class DynamicWorkflowGeneratorImpl implements WorkflowGenerator {
 				SparkNodeDetails sparkNodeDetails = dynamicWorkflowConfigObj.getSparkNodeDetails();
 				workFlowApp.getDecisionOrForkOrJoin()
 						.add(nodeCreator.createSparkActionNode(sparkNodeDetails.getNodeName(),
-								sparkNodeDetails.getJobTracker(), sparkNodeDetails.getNameNode(),
+								dynamicWorkflowConfigObj.getGlobalNodeDetails().getJobTracker(),
+								dynamicWorkflowConfigObj.getGlobalNodeDetails().getNameNode(),
 								sparkNodeDetails.getMaster(), sparkNodeDetails.getMode(),
 								sparkNodeDetails.getApplicationName(), sparkNodeDetails.getClassName(),
 								sparkNodeDetails.getJar(), sparkNodeDetails.getArgs(), sparkNodeDetails.getOkayToName(),
-								sparkNodeDetails.getErrorToName()));
+								sparkNodeDetails.getErrorToName(), sparkNodeDetails.getSparkOpts()));
+			}
+
+			// Adding Java action node details
+			if (dynamicWorkflowConfigObj.getJavaNodeDetails() != null) {
+				JavaNodeDetails javaNodeDetails = dynamicWorkflowConfigObj.getJavaNodeDetails();
+				workFlowApp.getDecisionOrForkOrJoin().add(nodeCreator.createJavaActionNode(
+						javaNodeDetails.getNodeName(), dynamicWorkflowConfigObj.getGlobalNodeDetails().getJobTracker(),
+						dynamicWorkflowConfigObj.getGlobalNodeDetails().getNameNode(), javaNodeDetails.getPrepareNode(),
+						javaNodeDetails.getJobXML(), javaNodeDetails.getConfigurationProperties(),
+						javaNodeDetails.getMainClass(), javaNodeDetails.getArgs(), javaNodeDetails.getOkayToName(),
+						javaNodeDetails.getErrorToName()));
 			}
 
 			// Adding Fork node to the workflow

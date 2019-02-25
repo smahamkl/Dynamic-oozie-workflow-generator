@@ -143,7 +143,7 @@ public class OozieNodeCreator {
 	 */
 	public ActionNode createSparkActionNode(String actionNodeName, String jobTracker, String nameNode, String master,
 			String mode, String applicationName, String mainClass, String jarName,
-			List<Arg> args, String okayNodeName, String errorNodeName) {
+			List<Arg> args, String okayNodeName, String errorNodeName, String sprkOpts) {
 
 		ActionNode action = oozieNodeFactory.createActionNode();
 		action.setName(actionNodeName);
@@ -156,7 +156,8 @@ public class OozieNodeCreator {
 		sparkAction.setName(applicationName);
 		sparkAction.setClazz(mainClass);
 		sparkAction.setJar(jarName);
-		sparkAction.setSparkOpts(setSparkOptions());
+		//sparkAction.setSparkOpts(setSparkOptions());
+		sparkAction.setSparkOpts(sprkOpts);
 		Iterator<Arg> argsItr = args.iterator();
 		while (argsItr.hasNext()) {
 			Arg arg = argsItr.next();

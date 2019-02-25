@@ -20,6 +20,11 @@ public class DynamicWorkflowConfig {
     @SerializedName("SSHNodeDetails")
     @Expose
     private SSHNodeDetails sSHNodeDetails;
+    
+    @SerializedName("ShellNodeDetails")
+    @Expose
+    private ShellNodeDetails shellNodeDetails;
+    
     @SerializedName("ForkNodeDetails")
     @Expose
     private ForkNodeDetails forkNodeDetails;
@@ -72,7 +77,15 @@ public class DynamicWorkflowConfig {
         this.sSHNodeDetails = sSHNodeDetails;
     }
 
-    public ForkNodeDetails getForkNodeDetails() {
+    public ShellNodeDetails getShellNodeDetails() {
+		return shellNodeDetails;
+	}
+
+	public void setShellNodeDetails(ShellNodeDetails shellNodeDetails) {
+		this.shellNodeDetails = shellNodeDetails;
+	}
+
+	public ForkNodeDetails getForkNodeDetails() {
         return forkNodeDetails;
     }
 

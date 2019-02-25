@@ -1,0 +1,79 @@
+{
+  "WorkflowName": "my-workflow",
+  "StartNodeName": "StartName",
+  "GlobalNodeDetails": {
+    "ConfigurationProperties": [
+      {
+        "PropertyName": "property-name1",
+        "PropertyValue": "property-value1"
+      },
+      {
+        "PropertyName": "property-name2",
+        "PropertyValue": "property-value2"
+      }
+    ]
+  },
+  "SqoopNodeDetails": {
+	"NodeName": "sqoop-node-name",
+	"JobXML": "jobXML.xml",
+	"PrepareNode": {
+		"DeleteArgs":[{"Path":"delete-path1"},{"Path":"delete-path2"}],
+		"MkdirArgs":[{"Path":"mkdir-path1"},{"Path":"mkdir-path2"}]
+	},
+	"Args": [
+      {
+        "Arg": "import"
+      },
+      {
+        "Arg": "--connect"
+      }
+    ],
+    "Files": [
+      {
+        "File": "sqoop-file-1"
+      }
+    ],
+	"OkayToName": "ok-name",
+    "ErrorToName": "error-to-name"
+  },
+  "SparkNodeDetails": {
+    "NodeName": "spark-node-name",
+    "Master": "master",
+    "Mode": "mode",
+    "ApplicationName": "name",
+	"ClassName": "Application.class",
+    "Jar": "jar-name",
+    "SparkOpts": "--queue queue-name --files file-path --driver-memory driver-memory --executor-memory executor-memory --executor-cores executor-cores",
+    "Args": [
+      {
+        "Arg": "spark-arg-1"
+      },
+      {
+        "Arg": "spark-arg-2"
+      }
+    ],
+    "OkayToName": "ok-name",
+    "ErrorToName": "error-to-name"
+  },
+  "JavaNodeDetails": {
+	"NodeName": "java-node-name",
+	"JobXML": "jobXML.xml",
+	"PrepareNode": {
+		"DeleteArgs":[{"Path":"delete-path1"},{"Path":"delete-path2"}],
+		"MkdirArgs":[{"Path":"mkdir-path1"},{"Path":"mkdir-path2"}]
+	},
+	"MainClass": "MainClass.class",
+	"JavaOpts": "java-opts",
+	"Args": [
+      {
+        "Arg": "spark-arg-1"
+      },
+      {
+        "Arg": "spark-arg-2"
+      }
+    ],
+	"OkayToName": "ok-name",
+    "ErrorToName": "error-to-name"
+  }
+  
+}
